@@ -95,6 +95,14 @@ def movesAvailable(table):
 			moves.append(i)
 	return moves
 
+#Choisi qui commence la partie
+def whoStart():
+	while True:
+		who = input("Qui commence (1: Vous, 0: Joseph): ")
+		if len(who) == 1 and ord(who) >= 48 and ord(who) <= 49:
+			return int(who)
+		print("Mauvaise saisie.")
+
 #Algorithme minimax
 def minimax(table, player, depth = 0):
 	bestMove = None
@@ -126,18 +134,18 @@ def ticTacToe():
 	table = initTable()
 	display(table)
 
-	turn = 1
+	turn = whoStart()
 
 
 	while True:
 		if gameOver(table, p1.tag):
-			print("Vous avez gagné.")
+			print("Vous avez gagné.", end = "\n\n")
 			break
 		elif gameOver(table, p2.tag):
-			print(p2.name,"a gagné.")
+			print(p2.name,"a gagné.", end = "\n\n")
 			break
 		elif gameDraw(table):
-			print("Partie Nulle.")
+			print("Partie Nulle.", end = "\n\n")
 			break
 
 		if turn:

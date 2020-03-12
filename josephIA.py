@@ -19,4 +19,4 @@ if __name__ == '__main__':
 				break
 		print("Mauvaise Saisie")
 
-	print('\t Joseph a hâte de vous revoir.')
+	print('\t Joseph a hâte de vous revoir.', end = "\n\n\n")
