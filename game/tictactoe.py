@@ -1,5 +1,9 @@
-from player import Player
 import os
+from player import Player
+
+p1 = Player('You', 'x') # turn = 1
+p2 = Player('Joseph', 'o') #turn = 0
+
 #Créer la table de jeu
 def initTable():
 	return [[' '] * 3 for i in range(3)]
@@ -8,8 +12,8 @@ def initTable():
 def display(table):
 	os.system('clear')
 	for i in range(3):
-		print('|',table[2 - i][0],'|',table[2 - i][1],'|',table[2 - i][2],'|')
-		if i != 2: print('-------------')
+		print('\t\t|',table[2 - i][0],'|',table[2 - i][1],'|',table[2 - i][2],'|')
+		if i != 2: print('\t\t-------------')
 
 #Vérifie si la colonne est gagnante
 def checkCol(table, tag):
@@ -116,11 +120,8 @@ def minimax(table, player, depth = 0):
 
 	return best, bestMove
 
-
+#Fonction principale du jeu
 def ticTacToe():
-
-	p1 = Player('You', 'x') # turn = 1
-	p2 = Player('Joseph', 'o') #turn = 0
 	
 	table = initTable()
 	display(table)
@@ -133,7 +134,7 @@ def ticTacToe():
 			print("Vous avez gagné.")
 			break
 		elif gameOver(table, p2.tag):
-			print(p2.name," a gagné.")
+			print(p2.name,"a gagné.")
 			break
 		elif gameDraw(table):
 			print("Partie Nulle.")
