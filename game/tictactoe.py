@@ -125,7 +125,7 @@ def minimax(table, player, depth = 0):
 		else:
 			if result < best:
 				best, bestMove = result, move
-
+	
 	return best, bestMove
 
 #Fonction principale du jeu
