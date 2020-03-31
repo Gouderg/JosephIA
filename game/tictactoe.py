@@ -1,4 +1,5 @@
 import os
+from math import inf
 from player import Player
 
 p1 = Player('You', 'x') # turn = 1
@@ -128,14 +129,45 @@ def minimax(table, player, depth = 0):
 	
 	return best, bestMove
 
+#Algorithme alphabeta
+def alphabeta(table, player, alpha, beta, depth = 0):
+	bestMove = None
+	best = 10 if getOpponent(player) == p2 else -10
+
+	if gameOver(table, p1.tag): 
+		return best + depth, None
+	elif gameDraw(table):  
+		return 0, None
+	elif gameOver(table, p2.tag):  
+		return best - depth, None
+
+	for move in movesAvailable(table):
+		table = putTable(table, move, player.tag)
+		result, _ = alphabeta(table, getOpponent(player), alpha, beta, depth + 1)
+		table = unPutTable(table, move)
+	
+		if player == p2:
+			if result > best:
+				best, bestMove = result, move
+			if best > beta:
+				return best, move
+			alpha = max(alpha, result)
+		else:
+			if result < best:
+				best, bestMove = result, move
+			if best < alpha:
+				return best, move
+			beta = min(beta, result) 
+	return best, bestMove
+
 #Fonction principale du jeu
 def ticTacToe():
-	
 	table = initTable()
 	display(table)
 
 	turn = whoStart()
-
+	alpha = - inf
+	beta = inf
 
 	while True:
 		if gameOver(table, p1.tag):
@@ -152,7 +184,8 @@ def ticTacToe():
 			place = takePlace(table)
 			table = putTable(table, place, p1.tag)
 		else:
-			_ , place = minimax(table, p2)
+			#_ , place = minimax(table, p2)
+			_ , place = alphabeta(table, p2, alpha, beta)
 			table = putTable(table, int(place), p2.tag)
 
 		display(table)
