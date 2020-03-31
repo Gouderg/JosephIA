@@ -1,16 +1,20 @@
 from player import Player
+from math import inf
 import os
+
+p1 = Player('You', 'x') # turn = 1
+p2 = Player('Joseph', 'o') #turn = 0
 
 #Initialise la table de jeu
 def initTable():
-	return [[' '] * 7 for i in range(7)]
-	'''return [['o', 'o', 'o', 'x', 'x', 'o', 'o'], 
+	#return [[' '] * 7 for i in range(7)]
+	return [['o', 'o', 'o', 'x', 'x', 'o', 'o'], 
 			['o', 'x', 'o', 'x', 'o', 'x', 'x'], 
 			['x', 'x', 'x', 'o', 'o', 'o', 'x'], 
 			['x', 'o', 'x', 'x', 'x', 'o', 'o'], 
 			['x', 'o', 'o', 'x', 'o', 'x', 'x'], 
-			['o', 'x', 'o', 'x', 'o', 'o', 'x'], 
-			[' ', ' ', ' ', ' ', ' ', ' ', ' ']]'''
+			['o', ' ', ' ', ' ', ' ', 'o', 'x'], 
+			[' ', ' ', ' ', ' ', ' ', ' ', ' ']]
 
 #Affiche le jeu
 def display(table):
@@ -98,6 +102,13 @@ def movesAvailable(table):
 			moves.append(i)
 	return moves
 
+def whoStart():
+	while True:
+		who = input("Qui commence (1: Vous, 0: Joseph): ")
+		if len(who) == 1 and ord(who) >= 48 and ord(who) <= 49:
+			return int(who)
+		print("Mauvaise saisie.")
+
 #Algorithme minimax
 def minimax(table, player, depth = 0):
 	bestMove = None
@@ -128,15 +139,49 @@ def minimax(table, player, depth = 0):
 
 	return best, bestMove
 
-if __name__ == '__main__':
-	
-	p1 = Player('Victor', 'x')
-	p2 = Player('Joseph4', 'o')
+#Algorithme AlphaBeta
+def alphabeta(table, player, alpha, beta, depth = 0):
+	bestMove = None
+	best = 10 if getOpponent(player) == p2 else -10
 
-	turn = 0
+	if gameOver(table, p1.tag): 
+		return best + depth, None
+	elif gameDraw(table):
+		return 0, None
+	elif gameOver(table, p2.tag):  
+		return best - depth, None
+
+	for move in movesAvailable(table):
+		table = fillTab(table, move, player.tag)
+		result, _ = alphabeta(table, getOpponent(player), alpha, beta, depth + 1)
+
+		if checkPlace(table, move) == None:
+			table = unFillTab(table, move, 6)
+		else:
+			table = unFillTab(table, move, checkPlace(table, move)-1)
+		
+		if player == p2:
+			if result > best:
+				best, bestMove = result, move
+			if best > beta:
+				return best, move
+			alpha = max(alpha, result)
+		else:
+			if result < best:
+				best, bestMove = result, move
+			if best < alpha:
+				return best, move
+			beta = min(beta, result)
+
+	return best, bestMove
+
+def connect4():
+
 	table = initTable()
 	display(table)
-
+	turn = whoStart()
+	alpha = -inf
+	beta = inf
 
 	while True:
 
@@ -155,7 +200,8 @@ if __name__ == '__main__':
 			place = takePlace(table)
 		else:
 			print('Moulinage...')
-			_ , place = minimax(table, p2)
+			#_, place = minimax(table, p2)
+			_, place = alphabeta(table, p2, alpha, beta)
 			   
 
 		table = fillTab(table, place, p1.tag if turn else p2.tag)

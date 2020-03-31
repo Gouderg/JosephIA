@@ -1,6 +1,7 @@
 import sys
 sys.path.append('./game')
 from tictactoe import ticTacToe
+from connect4 import connect4
 
 if __name__ == '__main__':
 	print("\t Bienvenue dans l'antre de Joseph, à quoi voulez-vous jouer?: ")
@@ -15,7 +16,7 @@ if __name__ == '__main__':
 				ticTacToe()
 				break
 			elif int(choix) == 2: 
-				print('Work in Progress')
+				connect4()
 				break
 		print("Mauvaise Saisie")
 
