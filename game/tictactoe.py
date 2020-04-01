@@ -149,13 +149,13 @@ def alphabeta(table, player, alpha, beta, depth = 0):
 		if player == p2:
 			if result > best:
 				best, bestMove = result, move
-			if best > beta:
+			if best >= beta:
 				return best, move
 			alpha = max(alpha, result)
 		else:
 			if result < best:
 				best, bestMove = result, move
-			if best < alpha:
+			if best <= alpha:
 				return best, move
 			beta = min(beta, result) 
 	return best, bestMove
