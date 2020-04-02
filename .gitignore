@@ -1,2 +1,2 @@
 game/sudoku.py
-__pycache__/
+game/__pycache__/
