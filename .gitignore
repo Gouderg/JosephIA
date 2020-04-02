@@ -1,3 +1,2 @@
-game/
-	sudoku.py
-	__pycache__/
+game/sudoku.py
+__pycache__/
