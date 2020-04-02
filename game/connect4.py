@@ -15,7 +15,7 @@ def initTable():
 
 #Affiche le jeu
 def display(table):
-	#os.system('clear')
+	os.system('clear')
 	for i in range(NB_ROW):
 		print("|", end=' ')
 		for j in range(NB_COL):
@@ -115,11 +115,22 @@ def whoStart():
 def countQuadruplet(quads):
 	valeur = 0
 	for quad in quads:
-		if ('x' in quad and 'o' in quad) or (' ' in quad and 'o' not in quad and 'x' not in quad): valeur += 0
-		elif ('o' in quad and 'x' not in quad): valeur += 10 ** quad.count('o')
-		elif ('x' in quad and 'o' not in quad): valeur += (-10) ** quad.count('x')
-	return valeur
 
+		if ('x' in quad and 'o' in quad) or (' ' in quad and 'o' not in quad and 'x' not in quad): 
+			valeur += 0
+		elif ('o' in quad and 'x' not in quad):
+			oVal = quad.count('o') 
+			if oVal == 1: valeur += 1
+			elif oVal == 2: valeur += 10
+			elif oVal == 3: valeur += 1000
+			elif oVal == 4: valeur += 100000
+		elif ('x' in quad and 'o' not in quad):
+			xVal = quad.count('x')
+			if xVal == 1: valeur -= 1
+			elif xVal == 2: valeur -= 10
+			elif xVal == 3: valeur -= 500
+
+	return valeur
 
 #Evalue la situation autour de lui
 def evalCurrentTable(table):
@@ -162,7 +173,7 @@ def evalCurrentTable(table):
 	
 
 #Algorithme AlphaBeta
-def alphabeta(table, player, alpha, beta, depth = 0, depthMax = 7):
+def alphabeta(table, player, alpha = -inf, beta = inf, depth = 0, depthMax = 6):
 	bestMove = None
 	best = 100000 if getOpponent(player) == p2 else -100000
 
@@ -173,7 +184,7 @@ def alphabeta(table, player, alpha, beta, depth = 0, depthMax = 7):
 	elif gameOver(table, p2.tag):  
 		return best - depth, None
 	elif depthMax == 0:
-		return evalCurrentBoard(table), None
+		return evalCurrentTable(table), None
 
 	for move in movesAvailable(table):
 		table = fillTab(table, move, player.tag)
@@ -199,16 +210,13 @@ def alphabeta(table, player, alpha, beta, depth = 0, depthMax = 7):
 
 	return best, bestMove
 
+#Fonction principal
 def connect4():
-
 	table = initTable()
 	display(table)
 	turn = whoStart()
-	alpha = -inf
-	beta = inf
 
 	while True:
-
 		if gameOver(table, p1.tag):
 			print(p1.name,'a gagné')
 			break
@@ -219,13 +227,11 @@ def connect4():
 			print("Partie nulle")
 			break
 
-
 		if turn: 
 			place = takePlace(table)
 		else:
-			print('Moulinage...')
-			#_, place = minimax(table, p2)
-			_, place = alphabeta(table, p2, alpha, beta)
+			print('Joseph réfléchi...')
+			_, place = alphabeta(table, p2)
 			   
 
 		table = fillTab(table, place, p1.tag if turn else p2.tag)
