@@ -111,7 +111,7 @@ def whoStart():
 			return int(who)
 		print("Mauvaise saisie.")
 
-#Retourne une valeur en fonction dde l'intéret du coup
+#Retourne une valeur en fonction de l'intéret du coup
 def countQuadruplet(quads):
 	valeur = 0
 	for quad in quads:
