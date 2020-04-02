@@ -2,26 +2,26 @@ from player import Player
 from math import inf
 import os
 
+#Constante
+NB_COL = 7
+NB_ROW = 6
+
 p1 = Player('You', 'x') # turn = 1
 p2 = Player('Joseph', 'o') #turn = 0
 
 #Initialise la table de jeu
 def initTable():
-	#return [[' '] * 7 for i in range(7)]
-	return [['o', 'o', 'o', 'x', 'x', 'o', 'o'], 
-			['o', 'x', 'o', 'x', 'o', 'x', 'x'], 
-			['x', 'x', 'x', 'o', 'o', 'o', 'x'], 
-			['x', 'o', 'x', 'x', 'x', 'o', 'o'], 
-			[' ', ' ', 'o', 'x', 'o', 'x', 'x'], 
-			[' ', ' ', ' ', ' ', ' ', ' ', ' '], 
-			[' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+	return [[' '] * NB_COL for i in range(NB_ROW)]
 
 #Affiche le jeu
 def display(table):
 	#os.system('clear')
-	for i in range(7):
-		print('|',table[6-i][0],'|',table[6-i][1],'|',table[6-i][2],'|',table[6-i][3],'|',table[6-i][4],'|',table[6-i][5],'|',table[6-i][6],'|')
-		if i != 6: print('-----------------------------')
+	for i in range(NB_ROW):
+		print("|", end=' ')
+		for j in range(NB_COL):
+			print(table[NB_ROW-1-i][j], "|", end=' ')
+		print(end='\n')
+		if i != 5: print('-----------------------------')
 	print('  1   2   3   4   5   6   7')
 
 #Prends le choix de l'utilisateur
@@ -36,14 +36,14 @@ def takePlace(table):
 
 #Regarde s'il y a de la place dans la colonne
 def checkPlace(table, x):
-	for i in range(7):
+	for i in range(NB_ROW):
 		if table[i][x-1] == ' ':
 			return i
 	return None 
 
 #Remplie la colonne selon la place disponible
 def fillTab(table, x, tag):
-	for i in range(7):
+	for i in range(NB_ROW):
 		if table[i][x-1] == ' ':
 			table[i][x-1] = tag;
 			break
@@ -55,38 +55,39 @@ def unFillTab(table, x,i):
 	return table
 
 #Regarde si 4 pions en colonne sont gagnants
-def checkCol(table, ligne, tag):
-	for i in range (4):
+def checkLig(table, ligne, tag):
+	for i in range(NB_COL-3):
 		if (table[ligne][i] == table[ligne][i + 1] == table[ligne][i + 2] == table[ligne][i + 3]) and (table[ligne][i] == tag):
 			return True
 	return False
 
 #Regarde si 4 pions en ligne sont gagnants
-def checkLig(table, ligne, tag):
-	for i in range (4):
+def checkCol(table, ligne, tag):
+	for i in range(NB_ROW-3):
 		if (table[i][ligne] == table[i + 1][ligne] == table[i + 2][ligne] == table[i + 3][ligne]) and (table[i][ligne] == tag):
-			return 1
-	return 0
+			return True
+	return False
 
 #Regarde si une diagonale est gagnante
 def checkDiag(table, tag):
-	for i in range(4):
-		for j in range(4):
+	for i in range(NB_ROW-3):
+		for j in range(NB_COL-3):
 			if ((table[i][6-j] == table[i + 1][5 - j] == table[i + 2][4 - j] == table[i + 3][3-j]) and (table[i][6 - j] == tag)) or ((table[i][j] == table[i + 1][1 + j] == table[i + 2][2 + j] == table[i + 3][3 + j]) and (table[i][j] == tag)):
 				return True
 	return False
 
 #Regarde si le jeu est fini
 def gameOver(table, tag):
-	for j in range(7):
-		if checkCol(table, j, tag) or checkLig(table, j, tag):
-			return True
+	for j in range(NB_COL):
+		if checkCol(table, j, tag): return True
+	for i in range(NB_ROW):
+		if checkLig(table, i, tag): return True
 	return checkDiag(table, tag)
 	
 #Regarde si la table est pleine
 def gameDraw(table):
-	for i in range(7):
-		for j in range(7):
+	for i in range(NB_ROW-3):
+		for j in range(NB_COL):
 			if table[i][j] ==' ': return False
 	return True
 
@@ -102,6 +103,7 @@ def movesAvailable(table):
 			moves.append(i)
 	return moves
 
+#Permet de savoir qui commence
 def whoStart():
 	while True:
 		who = input("Qui commence (1: Vous, 0: Joseph): ")
@@ -109,40 +111,60 @@ def whoStart():
 			return int(who)
 		print("Mauvaise saisie.")
 
-#Algorithme minimax
-def minimax(table, player, depth = 0):
-	bestMove = None
-	best = 10 if getOpponent(player) == p2 else -10
+#Retourne une valeur en fonction dde l'intéret du coup
+def countQuadruplet(quads):
+	valeur = 0
+	for quad in quads:
+		if ('x' in quad and 'o' in quad) or (' ' in quad and 'o' not in quad and 'x' not in quad): valeur += 0
+		elif ('o' in quad and 'x' not in quad): valeur += 10 ** quad.count('o')
+		elif ('x' in quad and 'o' not in quad): valeur += (-10) ** quad.count('x')
+	return valeur
 
-	if gameOver(table, p1.tag): 
-		return best + depth, None
-	elif gameDraw(table):
-		return 0, None
-	elif gameOver(table, p2.tag):  
-		return best - depth, None
 
-	for move in movesAvailable(table):
-		table = fillTab(table, move, player.tag)
-		result, _ = minimax(table, getOpponent(player), depth + 1)
+#Evalue la situation autour de lui
+def evalCurrentTable(table):
+	quad = []
+	#Check et stock les quadruplets en colonne
+	for ligne in range(NB_COL):
+		for i in range(NB_ROW-3):
+			col = []
+			col.append(table[i][ligne])
+			col.append(table[i + 1][ligne])
+			col.append(table[i + 2][ligne])
+			col.append(table[i + 3][ligne])
+			quad.append(col)
+	#Check et stock les quadruplets en ligne
+	for ligne in range(NB_ROW):
+		for i in range(NB_COL-3):
+			lig = []
+			lig.append(table[ligne][i])
+			lig.append(table[ligne][i + 1])
+			lig.append(table[ligne][i + 2])
+			lig.append(table[ligne][i + 3])
+			quad.append(lig)
+	#Check et stock les quadruplets en diagonale
+	for i in range(NB_ROW-3):
+		for j in range(NB_COL-3):
+			diag = []
+			diag.append(table[i][6 - j])
+			diag.append(table[i + 1][5 - j])
+			diag.append(table[i + 2][4 - j])
+			diag.append(table[i + 3][3 - j])
+			quad.append(diag)
+			diag = []
+			diag.append(table[i][j])
+			diag.append(table[i + 1][j + 1])
+			diag.append(table[i + 2][j + 2])
+			diag.append(table[i + 3][j + 3])
+			quad.append(diag)
 
-		if checkPlace(table, move) == None:
-			table = unFillTab(table, move, 6)
-		else:
-			table = unFillTab(table, move, checkPlace(table, move)-1)
-		
-		if player == p2:
-			if result > best:
-				best, bestMove = result, move
-		else:
-			if result < best:
-				best, bestMove = result, move
-
-	return best, bestMove
+	return countQuadruplet(quad)
+	
 
 #Algorithme AlphaBeta
-def alphabeta(table, player, alpha, beta, depth = 0):
+def alphabeta(table, player, alpha, beta, depth = 0, depthMax = 7):
 	bestMove = None
-	best = 10 if getOpponent(player) == p2 else -10
+	best = 100000 if getOpponent(player) == p2 else -100000
 
 	if gameOver(table, p1.tag): 
 		return best + depth, None
@@ -150,13 +172,15 @@ def alphabeta(table, player, alpha, beta, depth = 0):
 		return 0, None
 	elif gameOver(table, p2.tag):  
 		return best - depth, None
+	elif depthMax == 0:
+		return evalCurrentBoard(table), None
 
 	for move in movesAvailable(table):
 		table = fillTab(table, move, player.tag)
-		result, _ = alphabeta(table, getOpponent(player), alpha, beta, depth + 1)
+		result, _ = alphabeta(table, getOpponent(player), alpha, beta, depth + 1, depthMax - 1)
 
 		if checkPlace(table, move) == None:
-			table = unFillTab(table, move, 6)
+			table = unFillTab(table, move, NB_COL-2)
 		else:
 			table = unFillTab(table, move, checkPlace(table, move)-1)
 		
@@ -207,6 +231,3 @@ def connect4():
 		table = fillTab(table, place, p1.tag if turn else p2.tag)
 		display(table)
 		turn = not(turn)
-
-		
-	
