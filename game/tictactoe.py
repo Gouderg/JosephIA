@@ -2,8 +2,8 @@ import os
 from math import inf
 from player import Player
 
-p1 = Player('You', 'x') # turn = 1
-p2 = Player('Joseph', 'o') #turn = 0
+p1 = Player('You', '\033[31;1mx\033[0m') # turn = 1
+p2 = Player('Joseph', '\033[33;1mo\033[0m') #turn = 0
 
 #Créer la table de jeu
 def initTable():

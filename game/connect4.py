@@ -6,8 +6,8 @@ import os
 NB_COL = 7
 NB_ROW = 6
 
-p1 = Player('You', 'x') # turn = 1
-p2 = Player('Joseph', 'o') #turn = 0
+p1 = Player('You', '\033[31;1mx\033[0m') # turn = 1
+p2 = Player('Joseph', '\033[33;1mo\033[0m') #turn = 0
 
 #Initialise la table de jeu
 def initTable():
@@ -116,16 +116,18 @@ def countQuadruplet(quads):
 	valeur = 0
 	for quad in quads:
 
-		if ('x' in quad and 'o' in quad) or (' ' in quad and 'o' not in quad and 'x' not in quad): 
+		if (p1.tag in quad and p2.tag in quad) or (' ' in quad and p2.tag not in quad and p1.tag not in quad): 
 			valeur += 0
-		elif ('o' in quad and 'x' not in quad):
-			oVal = quad.count('o') 
+
+		elif (p2.tag in quad and p1.tag not in quad):
+			oVal = quad.count(p2.tag) 
 			if oVal == 1: valeur += 1
 			elif oVal == 2: valeur += 10
 			elif oVal == 3: valeur += 1000
 			elif oVal == 4: valeur += 100000
-		elif ('x' in quad and 'o' not in quad):
-			xVal = quad.count('x')
+
+		elif (p1.tag in quad and p2.tag not in quad):
+			xVal = quad.count(p1.tag)
 			if xVal == 1: valeur -= 1
 			elif xVal == 2: valeur -= 10
 			elif xVal == 3: valeur -= 500
@@ -218,7 +220,7 @@ def connect4():
 
 	while True:
 		if gameOver(table, p1.tag):
-			print(p1.name,'a gagné')
+			print('Vous avez gagné')
 			break
 		elif gameOver(table, p2.tag):
 			print(p2.name,'a gagné')
@@ -229,11 +231,13 @@ def connect4():
 
 		if turn: 
 			place = takePlace(table)
+			#_, place = alphabeta(table, p1)
 		else:
 			print('Joseph réfléchi...')
 			_, place = alphabeta(table, p2)
 			   
 
+		# table = fillTab(table, place, p1.couleur if turn else p2.couleur)
 		table = fillTab(table, place, p1.tag if turn else p2.tag)
 		display(table)
 		turn = not(turn)
