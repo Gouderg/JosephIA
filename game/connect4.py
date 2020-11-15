@@ -50,7 +50,7 @@ def fillTab(table, x, tag):
 	return table
 
 #Vide le tableau
-def unFillTab(table, x,i):
+def unFillTab(table, x, i):
 	table[i][x-1] = ' '
 	return table
 
