@@ -9,11 +9,23 @@ p2 = Player('Joseph', '\033[33;1mo\033[0m') #turn = 0
 def initTable():
 	return [[' '] * 3 for i in range(3)]
 
+# Explication de jeu.
+def howtoplay():
+	
+	print("\n\n How to play? => use you numpad !")
+	print('\t\t-------------')
+	print('\t\t| 7 | 8 | 9 |')
+	print('\t\t-------------')
+	print('\t\t| 4 | 5 | 6 |')
+	print('\t\t-------------')
+	print('\t\t| 1 | 2 | 3 |')
+	print('\t\t-------------')
 #Affiche le jeu
 def display(table):
 	os.system('clear')
 	for i in range(3):
 		print('\t\t|',table[2 - i][0],'|',table[2 - i][1],'|',table[2 - i][2],'|')
+
 		if i != 2: print('\t\t-------------')
 
 #Vérifie si la colonne est gagnante
@@ -99,7 +111,7 @@ def movesAvailable(table):
 #Choisi qui commence la partie
 def whoStart():
 	while True:
-		who = input("Qui commence (1: Vous, 0: Joseph): ")
+		who = input("\n Qui commence (1: Vous, 0: Joseph): ")
 		if len(who) == 1 and ord(who) >= 48 and ord(who) <= 49:
 			return int(who)
 		print("Mauvaise saisie.")
@@ -163,8 +175,10 @@ def alphabeta(table, player, alpha, beta, depth = 0):
 #Fonction principale du jeu
 def ticTacToe():
 	table = initTable()
-	display(table)
 
+	
+	display(table)
+	howtoplay()
 	turn = whoStart()
 	alpha = - inf
 	beta = inf
